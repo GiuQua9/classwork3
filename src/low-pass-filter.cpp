@@ -9,7 +9,7 @@
 int main(int argc, char **argv) {
 
 	//Initialize the ROS node with name: ros_topic_publisher
-	ros::init(argc, argv,"ros_topic_publisher");
+	ros::init(argc, argv,"sinusoide_topic_publisher");
 	
 	//Declare the node handle: our interface with the ROS system
 	ros::NodeHandle nh;
