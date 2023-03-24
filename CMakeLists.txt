@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(ros_topic_custom)
+project(cwork3)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -49,7 +49,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 add_message_files(
    FILES
-   my_msg.msg
+   sinusoid.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -132,7 +132,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(publish_custom src/publish_custom.cpp)
+add_executable(publish_sinusoid src/sinusoid.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(publish_custom   ${catkin_LIBRARIES} )
+target_link_libraries(publish_sinusoid   ${catkin_LIBRARIES} )

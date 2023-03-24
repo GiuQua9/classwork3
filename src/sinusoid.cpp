@@ -3,13 +3,14 @@
 #include "ros/ros.h" 
 //header file of the custom message
 //  This message belongs to the package in which it is defined
-#include "ros_topic_custom/my_msg.h"
+#include "cwork3/sinusoid.h"
+#include "math.h"
 
 
 int main(int argc, char **argv) {
 
 	//Initialize the ROS node with name: ros_topic_publisher
-	ros::init(argc, argv,"sinusoide_topic_publisher");
+	ros::init(argc, argv,"sinusoide_topic");
 	
 	//Declare the node handle: our interface with the ROS system
 	ros::NodeHandle nh;
@@ -18,17 +19,22 @@ int main(int argc, char **argv) {
 	//	Input:  - type of message: std_msgs::Int32
 	//			- topic name: /numbers
 	//			- message queue: 10 (0: infinite queue)
-	ros::Publisher topic_pub = nh.advertise<ros_topic_custom::my_msg>("/custom", 1);
+	ros::Publisher topic_sin = nh.advertise<cwork3::sinusoid>("/sinusoid", 1);
 
-	//Rate object: 10 Hz of rate
-	ros::Rate rate(10); 
-
-	int count = 0;
 
     //Define the custom datatype
-    ros_topic_custom::my_msg data;
-    //Fill the name part
-    data.name = "custom datatype";
+    cwork3::sinusoid data;
+	if(argc > 1){
+		data.amp = atof(argv[1]);
+		data.period = atof(argv[2]);
+	}
+
+	//printf("amp: %f\tfreq: %f\n",data.amp,1/data.period);
+
+	//Rate object: 100 Hz of rate
+	ros::Rate rate(10); 
+
+	int count=0;
 
 
 	// Typical loop: neverending loop: a controller works until actuators are activated
@@ -36,15 +42,16 @@ int main(int argc, char **argv) {
 	while ( ros::ok() ) {
 
         //Fill the data part
-		data.data = count++;
-
+		data.v = data.amp*sin(2*3.14*(1/data.period)*count*0.1);
 		//ROS_INFO: Like a printf, but with the timestamp
-		ROS_INFO("%d",data.data); 
+		ROS_INFO("sin: %.3f\tcount: %d",data.v,count); 
 
 		//Publish the message over the ROS network
-		topic_pub.publish(data);
+		topic_sin.publish(data);
+
+		count++;
 		
-		//Rate to maintain the 10 Hz
+		//Rate to maintain the 100 Hz
 		rate.sleep();
 	}
 	
