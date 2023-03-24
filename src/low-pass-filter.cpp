@@ -1,5 +1,6 @@
 
 #include "ros/ros.h"
+#include "cwork3/sinusoid.h"
 #include "cwork3/low_pass.h"
 
 using namespace std;
@@ -9,20 +10,21 @@ using namespace std;
 class Low_Pass {
 	public:
 		Low_Pass();
-		void topic_cb( std_msgs::Int32ConstPtr data);
+		void topic_cb( cwork3::sinusoid in);
 	
 	private:
 		ros::NodeHandle _nh;
 		//Subscriber object
 		ros::Subscriber _topic_sin;
-		ros::Publish _topic_pub;
+		ros::Publisher _topic_pub;
 		cwork3::low_pass _data;
+		float _LPF_Beta;
 };
 
 Low_Pass::Low_Pass() {
-	_data.in = 0.0;
 	_data.out = 0.0;
-	_topic_pub = nh.advertise<cwork3::lowpass>("/lowpass", 1);
+	_topic_pub = _nh.advertise<cwork3::low_pass>("/lowpass", 1);
+	_LPF_Beta = 0.6; // 0<ß<1
 	//Initialize a subscriber:
 	//	Input: 	topic name: /numbers
 	//			queue:	1
@@ -33,11 +35,15 @@ Low_Pass::Low_Pass() {
 
 //Callback function: the input of the function is the data to read
 //	In this function, a smart pointer is used
-void Low_Pass::topic_cb( std_msgs::Int32ConstPtr d) {
+void Low_Pass::topic_cb( cwork3::sinusoid in) {
 	
-	//data is a pointer of std_msgs::Int32 type
+	_data.out = _data.out - (_LPF_Beta * (_data.out - in.v));
+
+	//data is a pointer of std_msgs::float32 type
 	//	to access to its fiel, the "." can not be used
-	ROS_INFO("Listener: %d", d->data);
+	ROS_INFO("Listener: %.3f", _data.out);
+
+	
 }
 
 int main( int argc, char** argv ) {

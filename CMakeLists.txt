@@ -50,6 +50,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    sinusoid.msg
+   low_pass.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -133,6 +134,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(publish_sinusoid src/sinusoid.cpp)
+add_executable(publish_lowpass src/low-pass-filter.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(publish_sinusoid   ${catkin_LIBRARIES} )
+target_link_libraries(publish_lowpass   ${catkin_LIBRARIES} )
