@@ -9,42 +9,41 @@
 
 int main(int argc, char **argv) {
 
-	//Initialize the ROS node with name: ros_topic_publisher
+	//Initialize the ROS node with name
 	ros::init(argc, argv,"sinusoide_topic");
 	
 	//Declare the node handle: our interface with the ROS system
 	ros::NodeHandle nh;
 
 	//Create a publisher object:
-	//	Input:  - type of message: std_msgs::Int32
-	//			- topic name: /numbers
-	//			- message queue: 10 (0: infinite queue)
+	//	Input:  - type of message: cwork3::sinusoid
+	//			- topic name: /sinusoid
+	//			- message queue: 1 (0: infinite queue)
 	ros::Publisher topic_sin = nh.advertise<cwork3::sinusoid>("/sinusoid", 1);
 
 
     //Define the custom datatype
     cwork3::sinusoid data;
+	//data input
 	if(argc > 1){
 		data.amp = atof(argv[1]);
 		data.period = atof(argv[2]);
 	}
 
-	//printf("amp: %f\tfreq: %f\n",data.amp,1/data.period);
 
 	//Rate object: 100 Hz of rate
-	ros::Rate rate(10); 
+	ros::Rate rate(100); 
 
 	int count=0;
 
-
-	// Typical loop: neverending loop: a controller works until actuators are activated
 	//		while (ros::ok()): works until the ROS node is not terminated (by the user with ctrl+c or similar)
 	while ( ros::ok() ) {
 
-        //Fill the data part
-		data.v = data.amp*sin(2*3.14*(1/data.period)*count*0.1);
+        //sinusoid
+		data.v = data.amp*sin(2*3.14*(1/data.period)*count*0.01);
+
 		//ROS_INFO: Like a printf, but with the timestamp
-		ROS_INFO("sin: %.3f\tcount: %d",data.v,count); 
+		ROS_INFO("sin: %.3f\ttime: %.2f",data.v,count*0.01); 
 
 		//Publish the message over the ROS network
 		topic_sin.publish(data);

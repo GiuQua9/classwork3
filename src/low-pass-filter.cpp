@@ -1,5 +1,6 @@
 
 #include "ros/ros.h"
+#include "math.h"
 #include "cwork3/sinusoid.h"
 #include "cwork3/low_pass.h"
 
@@ -10,11 +11,10 @@ using namespace std;
 class Low_Pass {
 	public:
 		Low_Pass();
-		void topic_cb( cwork3::sinusoid in);
+		void topic_cb( cwork3::sinusoid in); //callback
 	
 	private:
 		ros::NodeHandle _nh;
-		//Subscriber object
 		ros::Subscriber _topic_sin;
 		ros::Publisher _topic_pub;
 		cwork3::low_pass _data;
@@ -24,9 +24,9 @@ class Low_Pass {
 Low_Pass::Low_Pass() {
 	_data.out = 0.0;
 	_topic_pub = _nh.advertise<cwork3::low_pass>("/lowpass", 1);
-	_LPF_Beta = 0.6; // 0<ß<1
+	_LPF_Beta = 1/(1+0.01); // 0<ß<1
 	//Initialize a subscriber:
-	//	Input: 	topic name: /numbers
+	//	Input: 	topic name: /sinusoid
 	//			queue:	1
 	//			Callback function
 	//			Object context: the value of data members
@@ -34,25 +34,26 @@ Low_Pass::Low_Pass() {
 }
 
 //Callback function: the input of the function is the data to read
-//	In this function, a smart pointer is used
 void Low_Pass::topic_cb( cwork3::sinusoid in) {
+	static int count = 0;
 	
-	_data.out = _data.out - (_LPF_Beta * (_data.out - in.v));
+	//filter
+	_data.out = _LPF_Beta*_data.out +(1-_LPF_Beta)*in.v;
 
-	//data is a pointer of std_msgs::float32 type
-	//	to access to its fiel, the "." can not be used
-	ROS_INFO("Listener: %.3f", _data.out);
+	ROS_INFO("sin: %.3f\t time: %.2f", _data.out, count*0.01);
+	count++;
 
 	
 }
 
 int main( int argc, char** argv ) {
 
-	//Init the ros node with ros_subscriber name
+	//Init the ros node with lowpass_topic name
 	ros::init(argc, argv, "lowpass_topic");
 
 	//Create the ROS_SUB class object
 	Low_Pass ls;
+	
 	
 	//ros::spin() blocks the main thread from exiting until ROS invokes a shutdown - via a Ctrl + C for example
 	// It is written as the last line of code of the main thread of the program.
