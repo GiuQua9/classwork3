@@ -41,6 +41,7 @@ void Low_Pass::topic_cb( cwork3::sinusoid in) {
 	_data.out = _LPF_Beta*_data.out +(1-_LPF_Beta)*in.v;
 
 	ROS_INFO("sin: %.3f\t time: %.2f", _data.out, count*0.01);
+	_topic_pub.publish(_data);
 	count++;
 
 	
